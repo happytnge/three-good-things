@@ -67,46 +67,50 @@ export default function EntryCard({
         </div>
       )}
 
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">
-            {formatDate(entry.entry_date, 'yyyy年MM月dd日 (E)')}
-          </h3>
-          {entry.tags.length > 0 && (
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {entry.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 text-xs font-semibold bg-white text-blue-700 border border-blue-700 rounded-full"
+      <div className="mb-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {formatDate(entry.entry_date, 'yyyy年MM月dd日 (E)')}
+            </h3>
+            {entry.tags.length > 0 && (
+              <div className="flex gap-2 mt-2 flex-wrap">
+                {entry.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 text-xs font-semibold bg-white text-blue-700 border border-blue-700 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          {showActions && (
+            <div className="flex gap-2 flex-shrink-0">
+              {onEdit && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => onEdit(entry)}
+                  className="min-w-[60px]"
                 >
-                  {tag}
-                </span>
-              ))}
+                  編集
+                </Button>
+              )}
+              {onDelete && !showDeleteConfirm && (
+                <Button
+                  size="sm"
+                  variant="danger"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="min-w-[60px]"
+                >
+                  削除
+                </Button>
+              )}
             </div>
           )}
         </div>
-        {showActions && (
-          <div className="flex gap-2">
-            {onEdit && (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => onEdit(entry)}
-              >
-                編集
-              </Button>
-            )}
-            {onDelete && !showDeleteConfirm && (
-              <Button
-                size="sm"
-                variant="danger"
-                onClick={() => setShowDeleteConfirm(true)}
-              >
-                削除
-              </Button>
-            )}
-          </div>
-        )}
       </div>
 
       {showDeleteConfirm && (
