@@ -40,18 +40,16 @@ export function useUsers() {
               .select('id')
               .eq('follower_id', user.id)
               .eq('following_id', profile.id)
-              .single()
-              .then(({ data }) => !!data)
-              .catch(() => false),
+              .maybeSingle()
+              .then(({ data }) => !!data),
             // 相手がフォローしているか
             supabase
               .from('follows')
               .select('id')
               .eq('follower_id', profile.id)
               .eq('following_id', user.id)
-              .single()
-              .then(({ data }) => !!data)
-              .catch(() => false),
+              .maybeSingle()
+              .then(({ data }) => !!data),
           ])
 
           return {
