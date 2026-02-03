@@ -30,11 +30,11 @@ export default function CalendarDay({ date, currentMonth, entry, onClick }: Cale
       )}
     >
       {/* 背景画像（サムネイル） */}
-      {hasImage && (
+      {hasImage && entry.image_url && (
         <div className="absolute inset-0 opacity-30">
           <img
             src={entry.image_url}
-            alt=""
+            alt="エントリー画像"
             className="w-full h-full object-cover"
           />
         </div>
@@ -51,11 +51,11 @@ export default function CalendarDay({ date, currentMonth, entry, onClick }: Cale
         </span>
 
         {/* 画像サムネイル（小さいアイコン表示） */}
-        {hasImage && (
+        {hasImage && entry.image_url && (
           <div className="mt-1 w-8 h-8 rounded border-2 border-white shadow-sm overflow-hidden">
             <img
               src={entry.image_url}
-              alt=""
+              alt="サムネイル"
               className="w-full h-full object-cover"
             />
           </div>
