@@ -18,13 +18,17 @@ export default function CalendarView({ currentDate, entries, onDateClick }: Cale
     return getCalendarDays(currentDate.getFullYear(), currentDate.getMonth())
   }, [currentDate])
 
-  const entryDates = useMemo(() => {
-    return new Set(entries.map(entry => entry.entry_date))
+  const entryMap = useMemo(() => {
+    const map = new Map<string, Entry>()
+    entries.forEach(entry => {
+      map.set(entry.entry_date, entry)
+    })
+    return map
   }, [entries])
 
-  const hasEntry = (date: Date) => {
+  const getEntry = (date: Date): Entry | undefined => {
     const dateString = toLocalDateString(date)
-    return entryDates.has(dateString)
+    return entryMap.get(dateString)
   }
 
   return (
@@ -47,15 +51,18 @@ export default function CalendarView({ currentDate, entries, onDateClick }: Cale
 
       {/* カレンダーグリッド */}
       <div className="grid grid-cols-7 gap-2">
-        {calendarDays.map((date, index) => (
-          <CalendarDay
-            key={index}
-            date={date}
-            currentMonth={currentDate}
-            hasEntry={hasEntry(date)}
-            onClick={onDateClick}
-          />
-        ))}
+        {calendarDays.map((date, index) => {
+          const entry = getEntry(date)
+          return (
+            <CalendarDay
+              key={index}
+              date={date}
+              currentMonth={currentDate}
+              entry={entry}
+              onClick={onDateClick}
+            />
+          )
+        })}
       </div>
     </div>
   )
