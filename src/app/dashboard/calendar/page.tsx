@@ -11,7 +11,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/ui/EmptyState'
 import Button from '@/components/ui/Button'
 import type { Entry, EntryFormData } from '@/lib/types'
-import { formatDate } from '@/lib/utils/dateUtils'
+import { formatDate, toLocalDateString } from '@/lib/utils/dateUtils'
 
 export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -30,15 +30,15 @@ export default function CalendarPage() {
   const loadMonthEntries = async () => {
     const year = currentDate.getFullYear()
     const month = currentDate.getMonth()
-    const firstDay = new Date(year, month, 1).toISOString().split('T')[0]
-    const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0]
+    const firstDay = toLocalDateString(new Date(year, month, 1))
+    const lastDay = toLocalDateString(new Date(year, month + 1, 0))
     const data = await fetchEntries(firstDay, lastDay)
     setEntries(data)
   }
 
   const handleDateClick = async (date: Date) => {
     setSelectedDate(date)
-    const dateString = date.toISOString().split('T')[0]
+    const dateString = toLocalDateString(date)
     const entry = await fetchEntryByDate(dateString)
     setSelectedEntry(entry)
     setShowForm(!entry)
@@ -111,7 +111,7 @@ export default function CalendarPage() {
         {showForm ? (
           <EntryForm
             initialData={isEditing ? selectedEntry || undefined : undefined}
-            initialDate={selectedDate?.toISOString().split('T')[0]}
+            initialDate={selectedDate ? toLocalDateString(selectedDate) : undefined}
             onSubmit={handleSubmit}
             onCancel={() => {
               setShowForm(false)

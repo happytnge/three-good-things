@@ -58,6 +58,14 @@ export function getTodayString(): string {
 }
 
 /**
+ * DateオブジェクトをローカルタイムゾーンでYYYY-MM-DD形式に変換
+ * toISOString()を使うとUTCに変換されて日付がずれるため、この関数を使用する
+ */
+export function toLocalDateString(date: Date): string {
+  return format(date, 'yyyy-MM-dd')
+}
+
+/**
  * ISO日付文字列をパース
  */
 export function parseISODate(dateString: string): Date {

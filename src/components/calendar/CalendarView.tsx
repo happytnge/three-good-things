@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import CalendarDay from './CalendarDay'
-import { getCalendarDays } from '@/lib/utils/dateUtils'
+import { getCalendarDays, toLocalDateString } from '@/lib/utils/dateUtils'
 import type { Entry } from '@/lib/types'
 
 interface CalendarViewProps {
@@ -23,7 +23,7 @@ export default function CalendarView({ currentDate, entries, onDateClick }: Cale
   }, [entries])
 
   const hasEntry = (date: Date) => {
-    const dateString = date.toISOString().split('T')[0]
+    const dateString = toLocalDateString(date)
     return entryDates.has(dateString)
   }
 

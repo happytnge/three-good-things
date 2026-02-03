@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useEntries } from '@/lib/hooks/useEntries'
 import ExportPanel from '@/components/export/ExportPanel'
 import { convertToJSON, convertToCSV, downloadFile } from '@/lib/utils/exportUtils'
+import { toLocalDateString } from '@/lib/utils/dateUtils'
 import type { ExportOptions } from '@/lib/types'
 
 export default function ExportPage() {
@@ -29,11 +30,11 @@ export default function ExportPage() {
 
       if (options.format === 'json') {
         data = convertToJSON(entries)
-        filename = `three-good-things-${new Date().toISOString().split('T')[0]}.json`
+        filename = `three-good-things-${toLocalDateString(new Date())}.json`
         mimeType = 'application/json'
       } else {
         data = convertToCSV(entries)
-        filename = `three-good-things-${new Date().toISOString().split('T')[0]}.csv`
+        filename = `three-good-things-${toLocalDateString(new Date())}.csv`
         mimeType = 'text/csv'
       }
 

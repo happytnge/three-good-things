@@ -6,6 +6,7 @@ import Textarea from '@/components/ui/Textarea'
 import Button from '@/components/ui/Button'
 import type { EntryFormData, Entry } from '@/lib/types'
 import { validateEntry } from '@/lib/utils/validationUtils'
+import { toLocalDateString } from '@/lib/utils/dateUtils'
 
 interface EntryFormProps {
   initialData?: Entry
@@ -23,7 +24,7 @@ export default function EntryForm({
   submitLabel = '保存',
 }: EntryFormProps) {
   const [formData, setFormData] = useState<EntryFormData>({
-    entry_date: initialData?.entry_date || initialDate || new Date().toISOString().split('T')[0],
+    entry_date: initialData?.entry_date || initialDate || toLocalDateString(new Date()),
     thing_one: initialData?.thing_one || '',
     thing_two: initialData?.thing_two || '',
     thing_three: initialData?.thing_three || '',
@@ -48,7 +49,7 @@ export default function EntryForm({
       // 成功時はフォームをリセット（新規作成の場合のみ）
       if (!initialData) {
         setFormData({
-          entry_date: new Date().toISOString().split('T')[0],
+          entry_date: toLocalDateString(new Date()),
           thing_one: '',
           thing_two: '',
           thing_three: '',
