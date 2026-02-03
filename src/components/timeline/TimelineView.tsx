@@ -5,15 +5,17 @@ import TimelineItem from './TimelineItem'
 import Button from '@/components/ui/Button'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/ui/EmptyState'
-import type { Entry } from '@/lib/types'
+import type { Entry, EntryWithSocialData } from '@/lib/types'
 
 interface TimelineViewProps {
-  entries: Entry[]
+  entries: EntryWithSocialData[]
   onEdit?: (entry: Entry) => void
   onDelete?: (id: string) => void
   hasMore?: boolean
   onLoadMore?: () => void
   loading?: boolean
+  showAuthor?: boolean
+  showSocial?: boolean
 }
 
 export default function TimelineView({
@@ -23,6 +25,8 @@ export default function TimelineView({
   hasMore = false,
   onLoadMore,
   loading = false,
+  showAuthor = false,
+  showSocial = false,
 }: TimelineViewProps) {
   if (entries.length === 0 && !loading) {
     return (
@@ -37,7 +41,13 @@ export default function TimelineView({
     <div className="space-y-0">
       {entries.map((entry, index) => (
         <div key={entry.id} className={index === entries.length - 1 ? 'last:pb-0' : ''}>
-          <TimelineItem entry={entry} onEdit={onEdit} onDelete={onDelete} />
+          <TimelineItem
+            entry={entry}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            showAuthor={showAuthor}
+            showSocial={showSocial}
+          />
         </div>
       ))}
 

@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { Entry, EntryFormData } from '@/lib/types'
+import type { Entry, EntryFormData, EntryWithSocialData } from '@/lib/types'
 import { extractTagsFromTexts } from '@/lib/utils/tagUtils'
 import { uploadImage, deleteImage } from '@/lib/utils/imageUtils'
 
@@ -11,15 +11,21 @@ export function useEntries() {
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
-  // エントリー一覧を取得
+  // エントリー一覧を取得（自分のエントリーのみ）
   const fetchEntries = useCallback(async (dateFrom?: string, dateTo?: string) => {
     setLoading(true)
     setError(null)
 
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('ユーザーが認証されていません')
+      }
+
       let query = supabase
         .from('entries')
         .select('*')
+        .eq('user_id', user.id) // 自分のエントリーのみフィルタリング
         .order('entry_date', { ascending: false })
 
       if (dateFrom) {
@@ -43,15 +49,21 @@ export function useEntries() {
     }
   }, [supabase])
 
-  // 特定の日付のエントリーを取得
+  // 特定の日付のエントリーを取得（自分のエントリーのみ）
   const fetchEntryByDate = useCallback(async (date: string) => {
     setLoading(true)
     setError(null)
 
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('ユーザーが認証されていません')
+      }
+
       const { data, error: fetchError } = await supabase
         .from('entries')
         .select('*')
+        .eq('user_id', user.id) // 自分のエントリーのみフィルタリング
         .eq('entry_date', date)
         .single()
 
@@ -241,11 +253,90 @@ export function useEntries() {
     }
   }, [supabase])
 
+  // パブリックタイムライン取得（全ユーザーのエントリー）
+  const fetchPublicTimeline = useCallback(async (limit = 20, offset = 0): Promise<EntryWithSocialData[]> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('ユーザーが認証されていません')
+      }
+
+      // 全ユーザーのエントリーを取得
+      const { data: entries, error: fetchError } = await supabase
+        .from('entries')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      if (fetchError) throw fetchError
+      if (!entries || entries.length === 0) return []
+
+      // ユニークなuser_idを取得
+      const userIds = [...new Set(entries.map(e => e.user_id))]
+
+      // プロフィール情報を一括取得
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', userIds)
+
+      if (profileError) {
+        console.error('Failed to fetch profiles:', profileError)
+      }
+
+      // プロフィールをマップに変換
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
+
+      // 各エントリーにプロフィール情報といいね情報を追加
+      const entriesWithSocialData = await Promise.all(
+        entries.map(async (entry: any) => {
+          const [likeCount, userLiked] = await Promise.all([
+            // いいね数
+            supabase
+              .from('likes')
+              .select('*', { count: 'exact', head: true })
+              .eq('entry_id', entry.id)
+              .then(({ count }) => count || 0),
+            // ユーザーがいいね済みか
+            supabase
+              .from('likes')
+              .select('id')
+              .eq('entry_id', entry.id)
+              .eq('user_id', user.id)
+              .single()
+              .then(({ data }) => !!data)
+              .catch(() => false),
+          ])
+
+          return {
+            ...entry,
+            profile: profileMap.get(entry.user_id),
+            like_count: likeCount,
+            liked_by_user: userLiked,
+          } as EntryWithSocialData
+        })
+      )
+
+      return entriesWithSocialData
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'タイムラインの取得に失敗しました'
+      setError(message)
+      console.error('Failed to fetch public timeline:', err)
+      return []
+    } finally {
+      setLoading(false)
+    }
+  }, [supabase])
+
   return {
     loading,
     error,
     fetchEntries,
     fetchEntryByDate,
+    fetchPublicTimeline,
     createEntry,
     updateEntry,
     deleteEntry,

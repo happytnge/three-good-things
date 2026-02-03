@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { Profile } from '@/lib/types'
+import type { Profile, ProfileWithStats, Entry } from '@/lib/types'
 import { uploadAvatar, deleteAvatar } from '@/lib/utils/avatarUtils'
 
 export function useProfile() {
@@ -123,10 +123,86 @@ export function useProfile() {
     }
   }, [supabase, updateProfile])
 
+  // 統計付き公開プロフィール取得
+  const fetchPublicProfile = useCallback(async (userId: string): Promise<ProfileWithStats | null> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (profileError) throw profileError
+
+      // 統計情報を並列取得
+      const [followerCount, followingCount, entryCount] = await Promise.all([
+        supabase
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('following_id', userId)
+          .then(({ count }) => count || 0),
+        supabase
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('follower_id', userId)
+          .then(({ count }) => count || 0),
+        supabase
+          .from('entries')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId)
+          .then(({ count }) => count || 0),
+      ])
+
+      return {
+        ...profile,
+        follower_count: followerCount,
+        following_count: followingCount,
+        entry_count: entryCount,
+      } as ProfileWithStats
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '公開プロフィールの取得に失敗しました'
+      setError(message)
+      console.error('Failed to fetch public profile:', err)
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [supabase])
+
+  // ユーザーのエントリー取得
+  const fetchUserEntries = useCallback(async (userId: string, limit = 10): Promise<Entry[]> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('entries')
+        .select('*')
+        .eq('user_id', userId)
+        .order('entry_date', { ascending: false })
+        .limit(limit)
+
+      if (fetchError) throw fetchError
+      return data as Entry[]
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'ユーザーエントリーの取得に失敗しました'
+      setError(message)
+      console.error('Failed to fetch user entries:', err)
+      return []
+    } finally {
+      setLoading(false)
+    }
+  }, [supabase])
+
   return {
     loading,
     error,
     fetchProfile,
+    fetchPublicProfile,
+    fetchUserEntries,
     updateProfile,
     updateAvatar,
     removeAvatar,

@@ -15,9 +15,15 @@ export function useSearch() {
     setError(null)
 
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('ユーザーが認証されていません')
+      }
+
       let query = supabase
         .from('entries')
         .select('*')
+        .eq('user_id', user.id) // 自分のエントリーのみ検索
         .order('entry_date', { ascending: false })
 
       // 日付範囲フィルター

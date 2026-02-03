@@ -1,16 +1,21 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { User } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import type { Entry } from '@/lib/types'
+import LikeButton from '@/components/social/LikeButton'
+import type { Entry, EntryWithSocialData } from '@/lib/types'
 import { formatDate } from '@/lib/utils/dateUtils'
 
 interface EntryCardProps {
-  entry: Entry
+  entry: EntryWithSocialData
   onEdit?: (entry: Entry) => void
   onDelete?: (id: string) => void
   showActions?: boolean
+  showAuthor?: boolean
+  showSocial?: boolean
 }
 
 export default function EntryCard({
@@ -18,6 +23,8 @@ export default function EntryCard({
   onEdit,
   onDelete,
   showActions = true,
+  showAuthor = false,
+  showSocial = false,
 }: EntryCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -30,6 +37,36 @@ export default function EntryCard({
 
   return (
     <Card>
+      {/* 著者情報 */}
+      {showAuthor && entry.profile && (
+        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
+          <Link
+            href={`/dashboard/users/${entry.user_id}`}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
+            {entry.profile.avatar_url ? (
+              <img
+                src={entry.profile.avatar_url}
+                alt={entry.profile.display_name || entry.profile.email}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                <User size={20} className="text-gray-500" />
+              </div>
+            )}
+            <div>
+              <p className="font-semibold text-gray-900">
+                {entry.profile.display_name || entry.profile.email}
+              </p>
+              {entry.profile.display_name && (
+                <p className="text-sm text-gray-500">{entry.profile.email}</p>
+              )}
+            </div>
+          </Link>
+        </div>
+      )}
+
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
@@ -151,6 +188,19 @@ export default function EntryCard({
             src={entry.image_url}
             alt="今日のイメージ"
             className="max-w-full rounded-lg border border-gray-300"
+          />
+        </div>
+      )}
+
+      {/* ソーシャル機能 */}
+      {showSocial && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <LikeButton
+            entryId={entry.id}
+            initialLiked={entry.liked_by_user}
+            initialCount={entry.like_count}
+            size="md"
+            showCount={true}
           />
         </div>
       )}
