@@ -306,9 +306,8 @@ export function useEntries() {
               .select('id')
               .eq('entry_id', entry.id)
               .eq('user_id', user.id)
-              .single()
-              .then(({ data }) => !!data)
-              .catch(() => false),
+              .maybeSingle()
+              .then(({ data }) => !!data),
           ])
 
           return {
