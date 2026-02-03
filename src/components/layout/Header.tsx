@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useProfile } from '@/lib/hooks/useProfile'
 import { cn } from '@/lib/utils/cn'
 import { User } from 'lucide-react'
 
@@ -15,6 +17,19 @@ const navigation = [
 
 export default function Header() {
   const pathname = usePathname()
+  const { fetchProfile } = useProfile()
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    loadAvatar()
+  }, [pathname]) // パスが変わったらアバターを再読み込み
+
+  const loadAvatar = async () => {
+    const profile = await fetchProfile()
+    if (profile) {
+      setAvatarUrl(profile.avatar_url)
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -50,13 +65,23 @@ export default function Header() {
             <Link
               href="/dashboard/profile"
               className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150',
+                'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150',
                 pathname === '/dashboard/profile'
                   ? 'bg-blue-700 text-white shadow-sm'
                   : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-inset'
               )}
             >
-              <User size={18} />
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="プロフィール"
+                  className="w-8 h-8 rounded-full object-cover border-2 border-current"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2 border-current">
+                  <User size={16} />
+                </div>
+              )}
               <span className="hidden sm:inline">プロフィール</span>
             </Link>
           </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useProfile } from '@/lib/hooks/useProfile'
@@ -10,17 +10,20 @@ import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { formatDate } from '@/lib/utils/dateUtils'
-import { User, Mail, Calendar, FileText } from 'lucide-react'
+import { validateAvatar } from '@/lib/utils/avatarUtils'
+import { User, Mail, Calendar, FileText, Camera, X } from 'lucide-react'
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth()
-  const { fetchProfile, updateProfile, loading: profileLoading } = useProfile()
+  const { fetchProfile, updateProfile, updateAvatar, removeAvatar, loading: profileLoading } = useProfile()
   const { fetchEntries } = useEntries()
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [createdAt, setCreatedAt] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [totalEntries, setTotalEntries] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -36,6 +39,46 @@ export default function ProfilePage() {
       setDisplayName(profile.display_name || '')
       setEmail(profile.email)
       setCreatedAt(profile.created_at)
+      setAvatarUrl(profile.avatar_url)
+    }
+  }
+
+  const handleAvatarSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setMessage(null)
+
+    // バリデーション
+    const validation = validateAvatar(file)
+    if (!validation.valid) {
+      setMessage({ type: 'error', text: validation.error || 'アバター画像が無効です' })
+      return
+    }
+
+    // アップロード
+    const updated = await updateAvatar(file)
+    if (updated) {
+      setAvatarUrl(updated.avatar_url)
+      setMessage({ type: 'success', text: 'プロフィール画像を更新しました' })
+    } else {
+      setMessage({ type: 'error', text: 'プロフィール画像のアップロードに失敗しました' })
+    }
+
+    // ファイル入力をリセット
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const handleAvatarRemove = async () => {
+    setMessage(null)
+    const updated = await removeAvatar()
+    if (updated) {
+      setAvatarUrl(null)
+      setMessage({ type: 'success', text: 'プロフィール画像を削除しました' })
+    } else {
+      setMessage({ type: 'error', text: 'プロフィール画像の削除に失敗しました' })
     }
   }
 
@@ -98,6 +141,60 @@ export default function ProfilePage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">基本情報</h2>
 
             <div className="space-y-6">
+              {/* プロフィール画像 */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  プロフィール画像
+                </label>
+                <div className="flex items-center gap-4">
+                  {/* アバター表示 */}
+                  <div className="relative">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt="プロフィール画像"
+                        className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300">
+                        <User size={40} className="text-gray-500" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* アクションボタン */}
+                  <div className="flex flex-col gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleAvatarSelect}
+                      className="hidden"
+                      id="avatar-upload"
+                    />
+                    <label
+                      htmlFor="avatar-upload"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors text-sm font-semibold"
+                    >
+                      <Camera size={16} />
+                      <span>画像を変更</span>
+                    </label>
+                    {avatarUrl && (
+                      <button
+                        onClick={handleAvatarRemove}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors text-sm font-semibold"
+                        disabled={profileLoading}
+                      >
+                        <X size={16} />
+                        <span>画像を削除</span>
+                      </button>
+                    )}
+                    <p className="text-xs text-gray-700">
+                      JPG, PNG, GIF, WEBP (最大2MB)
+                    </p>
+                  </div>
+                </div>
+              </div>
               {/* 表示名 */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
