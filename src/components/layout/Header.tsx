@@ -1,10 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/hooks/useAuth'
-import Button from '@/components/ui/Button'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils/cn'
+import { User } from 'lucide-react'
 
 const navigation = [
   { name: 'ダッシュボード', href: '/dashboard' },
@@ -16,13 +15,6 @@ const navigation = [
 
 export default function Header() {
   const pathname = usePathname()
-  const router = useRouter()
-  const { user, signOut } = useAuth()
-
-  const handleSignOut = async () => {
-    await signOut()
-    router.push('/')
-  }
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">
@@ -55,12 +47,18 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="hidden sm:block text-sm text-gray-600 font-medium">
-              {user?.email}
-            </span>
-            <Button variant="secondary" size="sm" onClick={handleSignOut}>
-              ログアウト
-            </Button>
+            <Link
+              href="/dashboard/profile"
+              className={cn(
+                'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150',
+                pathname === '/dashboard/profile'
+                  ? 'bg-blue-700 text-white shadow-sm'
+                  : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-inset'
+              )}
+            >
+              <User size={18} />
+              <span className="hidden sm:inline">プロフィール</span>
+            </Link>
           </div>
         </div>
 
