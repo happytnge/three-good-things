@@ -17,6 +17,8 @@ export interface Entry {
   thing_two: string
   thing_three: string
   tags: string[]
+  image_url: string | null
+  image_path: string | null
   created_at: string
   updated_at: string
 }
@@ -26,6 +28,9 @@ export interface EntryFormData {
   thing_one: string
   thing_two: string
   thing_three: string
+  image?: File | null
+  existing_image_url?: string | null
+  existing_image_path?: string | null
 }
 
 export interface SearchFilters {

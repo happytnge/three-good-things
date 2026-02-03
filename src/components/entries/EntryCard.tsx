@@ -126,6 +126,17 @@ export default function EntryCard({
           </div>
         </div>
       </div>
+
+      {/* 画像表示 */}
+      {entry.image_url && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <img
+            src={entry.image_url}
+            alt="今日のイメージ"
+            className="max-w-full rounded-lg border border-gray-300"
+          />
+        </div>
+      )}
     </Card>
   )
 }

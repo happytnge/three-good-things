@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Entry, EntryFormData } from '@/lib/types'
 import { extractTagsFromTexts } from '@/lib/utils/tagUtils'
+import { uploadImage, deleteImage } from '@/lib/utils/imageUtils'
 
 export function useEntries() {
   const [loading, setLoading] = useState(false)
@@ -84,6 +85,16 @@ export function useEntries() {
         throw new Error('ユーザーが認証されていません')
       }
 
+      // 画像をアップロード（存在する場合）
+      let imageUrl: string | null = null
+      let imagePath: string | null = null
+
+      if (formData.image) {
+        const uploadResult = await uploadImage(user.id, formData.image)
+        imageUrl = uploadResult.url
+        imagePath = uploadResult.path
+      }
+
       // タグを抽出
       const tags = extractTagsFromTexts(
         formData.thing_one,
@@ -91,7 +102,7 @@ export function useEntries() {
         formData.thing_three
       )
 
-      console.log('Creating entry with data:', { ...formData, tags, user_id: user.id })
+      console.log('Creating entry with data:', { ...formData, tags, user_id: user.id, image_url: imageUrl })
 
       const { data, error: createError } = await supabase
         .from('entries')
@@ -102,12 +113,18 @@ export function useEntries() {
           thing_two: formData.thing_two,
           thing_three: formData.thing_three,
           tags,
+          image_url: imageUrl,
+          image_path: imagePath,
         })
         .select()
         .single()
 
       if (createError) {
         console.error('Create entry error:', createError)
+        // エントリー作成に失敗した場合、アップロードした画像を削除
+        if (imagePath) {
+          await deleteImage(imagePath)
+        }
         throw createError
       }
 
@@ -129,6 +146,27 @@ export function useEntries() {
     setError(null)
 
     try {
+      // 現在のユーザーを取得
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('ユーザーが認証されていません')
+      }
+
+      // 新しい画像がアップロードされた場合
+      let imageUrl = formData.existing_image_url
+      let imagePath = formData.existing_image_path
+
+      if (formData.image) {
+        // 古い画像を削除
+        if (formData.existing_image_path) {
+          await deleteImage(formData.existing_image_path)
+        }
+        // 新しい画像をアップロード
+        const uploadResult = await uploadImage(user.id, formData.image)
+        imageUrl = uploadResult.url
+        imagePath = uploadResult.path
+      }
+
       // タグを抽出
       const tags = extractTagsFromTexts(
         formData.thing_one,
@@ -144,6 +182,8 @@ export function useEntries() {
           thing_two: formData.thing_two,
           thing_three: formData.thing_three,
           tags,
+          image_url: imageUrl,
+          image_path: imagePath,
         })
         .eq('id', id)
         .select()
@@ -167,12 +207,25 @@ export function useEntries() {
     setError(null)
 
     try {
+      // エントリーを取得して画像パスを確認
+      const { data: entry } = await supabase
+        .from('entries')
+        .select('image_path')
+        .eq('id', id)
+        .single()
+
+      // エントリーを削除
       const { error: deleteError } = await supabase
         .from('entries')
         .delete()
         .eq('id', id)
 
       if (deleteError) throw deleteError
+
+      // 画像が存在する場合は削除
+      if (entry?.image_path) {
+        await deleteImage(entry.image_path)
+      }
 
       return true
     } catch (err) {
