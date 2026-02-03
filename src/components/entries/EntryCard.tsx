@@ -125,6 +125,23 @@ export default function EntryCard({
             </p>
           </div>
         </div>
+
+        {/* 感謝 (+1) */}
+        {entry.gratitude && (
+          <div className="pt-4 mt-4 border-t border-gray-200">
+            <div className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                +1
+              </span>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-900 mb-1">今日の感謝</p>
+                <p className="text-gray-700">
+                  {entry.gratitude}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 画像表示 */}

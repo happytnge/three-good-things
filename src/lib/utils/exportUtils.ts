@@ -7,6 +7,7 @@ export function convertToJSON(entries: Entry[]): string {
   const formatted = entries.map(entry => ({
     date: entry.entry_date,
     things: [entry.thing_one, entry.thing_two, entry.thing_three],
+    gratitude: entry.gratitude,
     tags: entry.tags,
   }))
   return JSON.stringify(formatted, null, 2)
@@ -16,12 +17,13 @@ export function convertToJSON(entries: Entry[]): string {
  * エントリーをCSV形式に変換
  */
 export function convertToCSV(entries: Entry[]): string {
-  const headers = ['Date', 'Thing 1', 'Thing 2', 'Thing 3', 'Tags']
+  const headers = ['Date', 'Thing 1', 'Thing 2', 'Thing 3', 'Gratitude', 'Tags']
   const rows = entries.map(entry => [
     entry.entry_date,
     escapeCSV(entry.thing_one),
     escapeCSV(entry.thing_two),
     escapeCSV(entry.thing_three),
+    escapeCSV(entry.gratitude || ''),
     entry.tags.join(','),
   ])
 

@@ -41,6 +41,10 @@ export function validateEntry(data: EntryFormData): { valid: boolean; errors: Re
     errors.thing_three = '3つ目の良いことを入力してください'
   }
 
+  if (!data.gratitude || data.gratitude.trim().length === 0) {
+    errors.gratitude = '今日の感謝を入力してください'
+  }
+
   return {
     valid: Object.keys(errors).length === 0,
     errors,

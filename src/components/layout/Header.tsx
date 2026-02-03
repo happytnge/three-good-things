@@ -40,7 +40,7 @@ export default function Header() {
               href="/dashboard"
               className="text-2xl font-bold text-gray-900 hover:text-blue-700 transition-colors duration-150"
             >
-              Three Good Things
+              Three Good Things +1
             </Link>
 
             <nav className="hidden md:flex gap-2">

@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Three Good Things',
-  description: '毎日3つの良いことを記録するアプリ',
+  title: 'Three Good Things +1',
+  description: '毎日3つの良いこと + 1つの感謝を記録するアプリ',
 }
 
 export default function RootLayout({

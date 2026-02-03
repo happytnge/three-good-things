@@ -16,6 +16,7 @@ export interface Entry {
   thing_one: string
   thing_two: string
   thing_three: string
+  gratitude: string | null
   tags: string[]
   image_url: string | null
   image_path: string | null
@@ -28,6 +29,7 @@ export interface EntryFormData {
   thing_one: string
   thing_two: string
   thing_three: string
+  gratitude: string
   image?: File | null
   existing_image_url?: string | null
   existing_image_path?: string | null

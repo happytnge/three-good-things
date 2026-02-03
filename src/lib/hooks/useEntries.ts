@@ -99,7 +99,8 @@ export function useEntries() {
       const tags = extractTagsFromTexts(
         formData.thing_one,
         formData.thing_two,
-        formData.thing_three
+        formData.thing_three,
+        formData.gratitude
       )
 
       console.log('Creating entry with data:', { ...formData, tags, user_id: user.id, image_url: imageUrl })
@@ -112,6 +113,7 @@ export function useEntries() {
           thing_one: formData.thing_one,
           thing_two: formData.thing_two,
           thing_three: formData.thing_three,
+          gratitude: formData.gratitude,
           tags,
           image_url: imageUrl,
           image_path: imagePath,
@@ -171,7 +173,8 @@ export function useEntries() {
       const tags = extractTagsFromTexts(
         formData.thing_one,
         formData.thing_two,
-        formData.thing_three
+        formData.thing_three,
+        formData.gratitude
       )
 
       const { data, error: updateError } = await supabase
@@ -181,6 +184,7 @@ export function useEntries() {
           thing_one: formData.thing_one,
           thing_two: formData.thing_two,
           thing_three: formData.thing_three,
+          gratitude: formData.gratitude,
           tags,
           image_url: imageUrl,
           image_path: imagePath,

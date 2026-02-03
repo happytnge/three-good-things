@@ -5,10 +5,10 @@ export default function Home() {
     <main className="min-h-screen flex items-center justify-center bg-white">
       <div className="text-center px-4 max-w-4xl mx-auto">
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-          Three Good Things
+          Three Good Things +1
         </h1>
         <p className="text-xl text-gray-700 mb-12 leading-relaxed max-w-2xl mx-auto">
-          毎日3つの良いことを記録して、<br />ポジティブな習慣を育てましょう
+          毎日3つの良いこと + 1つの感謝を記録して、<br />ポジティブな習慣を育てましょう
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
           <Link

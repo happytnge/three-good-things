@@ -30,6 +30,7 @@ export default function EntryForm({
     thing_one: initialData?.thing_one || '',
     thing_two: initialData?.thing_two || '',
     thing_three: initialData?.thing_three || '',
+    gratitude: initialData?.gratitude || '',
     existing_image_url: initialData?.image_url || null,
     existing_image_path: initialData?.image_path || null,
   })
@@ -94,6 +95,7 @@ export default function EntryForm({
           thing_one: '',
           thing_two: '',
           thing_three: '',
+          gratitude: '',
           existing_image_url: null,
           existing_image_path: null,
         })
@@ -144,6 +146,16 @@ export default function EntryForm({
         value={formData.thing_three}
         onChange={(e) => setFormData({ ...formData, thing_three: e.target.value })}
         error={errors.thing_three}
+        rows={3}
+        required
+      />
+
+      <Textarea
+        label="今日の感謝 (+1)"
+        placeholder="今日感謝したことを書いてください... (#タグ も使えます)"
+        value={formData.gratitude}
+        onChange={(e) => setFormData({ ...formData, gratitude: e.target.value })}
+        error={errors.gratitude}
         rows={3}
         required
       />
