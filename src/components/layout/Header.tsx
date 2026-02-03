@@ -5,14 +5,14 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useProfile } from '@/lib/hooks/useProfile'
 import { cn } from '@/lib/utils/cn'
-import { User } from 'lucide-react'
+import { User, LayoutDashboard, Calendar, Clock, Search, Download } from 'lucide-react'
 
 const navigation = [
-  { name: 'ダッシュボード', href: '/dashboard' },
-  { name: 'カレンダー', href: '/dashboard/calendar' },
-  { name: 'タイムライン', href: '/dashboard/timeline' },
-  { name: '検索', href: '/dashboard/search' },
-  { name: 'エクスポート', href: '/dashboard/export' },
+  { name: 'ダッシュボード', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'カレンダー', href: '/dashboard/calendar', icon: Calendar },
+  { name: 'タイムライン', href: '/dashboard/timeline', icon: Clock },
+  { name: '検索', href: '/dashboard/search', icon: Search },
+  { name: 'エクスポート', href: '/dashboard/export', icon: Download },
 ]
 
 export default function Header() {
@@ -44,28 +44,34 @@ export default function Header() {
             </Link>
 
             <nav className="hidden md:flex gap-2">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    'px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150',
-                    pathname === item.href
-                      ? 'bg-blue-700 text-white shadow-sm'
-                      : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-inset'
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
+              {navigation.map((item) => {
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    title={item.name}
+                    className={cn(
+                      'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150',
+                      pathname === item.href
+                        ? 'bg-blue-700 text-white shadow-sm'
+                        : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-inset'
+                    )}
+                  >
+                    <Icon size={20} />
+                    <span>{item.name}</span>
+                  </Link>
+                )
+              })}
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard/profile"
+              title="プロフィール"
               className={cn(
-                'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150',
+                'p-2 rounded-lg transition-all duration-150',
                 pathname === '/dashboard/profile'
                   ? 'bg-blue-700 text-white shadow-sm'
                   : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-inset'
@@ -82,27 +88,30 @@ export default function Header() {
                   <User size={16} />
                 </div>
               )}
-              <span className="hidden sm:inline">プロフィール</span>
             </Link>
           </div>
         </div>
 
         {/* モバイルナビゲーション */}
         <nav className="md:hidden flex gap-2 pb-4 overflow-x-auto">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                'px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-150',
-                pathname === item.href
-                  ? 'bg-blue-700 text-white shadow-sm'
-                  : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
-              )}
-            >
-              {item.name}
-            </Link>
-          ))}
+          {navigation.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                title={item.name}
+                className={cn(
+                  'p-2.5 rounded-lg transition-all duration-150',
+                  pathname === item.href
+                    ? 'bg-blue-700 text-white shadow-sm'
+                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+                )}
+              >
+                <Icon size={20} />
+              </Link>
+            )
+          })}
         </nav>
       </div>
     </header>
