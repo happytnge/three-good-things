@@ -1,22 +1,26 @@
-http://localhost:3000/dashboard/calendar
+http://localhost:3000/dashboard
 
-１．カレンダーに登録されているデータが、１日ずれています。2月1日のデータが、2月2日のカレンダーに表示されています。
+１．スマホ（iphone14pro）で確認したら、日付データが表示されているテキストボックスだけが、右に飛び出しています。
+その下の、良いことが書かれている３つのテキストボックスは飛び出ていません。良いことのテキストボックスと同じように、飛び出さないように修正してください。
 
 ## 修正完了
 
-### 1. カレンダー日付のズレ問題（✅ 修正済み）
+### 1. iPhone 14 Proでの日付入力フィールドの右飛び出し問題（✅ 修正済み）
 
-**問題:** カレンダーに表示されるエントリーの日付が1日ずれていた
+**問題:** iPhoneで日付入力フィールドだけが右に飛び出していた
 
-**原因:** `Date.toISOString().split('T')[0]` を使用していたため、UTCタイムゾーンに変換され、日本時間（UTC+9）との時差で日付がずれていた
+**原因:**
+- iOSのネイティブdate inputに独自のスタイルとカレンダーピッカーが追加される
+- デフォルトのパディングと組み合わさって幅が100%を超えていた
 
 **修正内容:**
-- `dateUtils.ts` に `toLocalDateString()` 関数を追加
-- すべての `toISOString().split('T')[0]` を `toLocalDateString()` に置き換え
-- 影響したファイル:
-  - `src/components/calendar/CalendarView.tsx`
-  - `src/components/entries/EntryForm.tsx`
-  - `src/app/dashboard/calendar/page.tsx`
-  - `src/app/dashboard/export/page.tsx`
+1. `Input.tsx` に以下を追加:
+   - `max-w-full` - 最大幅を100%に制限
+   - `box-border` - ボーダーとパディングを幅計算に含める
 
-**結果:** ローカルタイムゾーンで正しく日付が表示されるようになりました
+2. `globals.css` にiOS date input専用のCSSを追加:
+   - `-webkit-appearance: none` でネイティブスタイルをリセット
+   - `min-width: 0` で幅の最小値を制限
+   - カレンダーアイコンの位置を調整
+
+**結果:** iPhoneで日付入力フィールドが他のフィールドと同じように正しく表示されるようになりました
