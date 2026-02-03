@@ -57,11 +57,8 @@ export default function EntryCard({
             )}
             <div>
               <p className="font-semibold text-gray-900">
-                {entry.profile.display_name || entry.profile.email}
+                {entry.profile.display_name || 'ユーザー'}
               </p>
-              {entry.profile.display_name && (
-                <p className="text-sm text-gray-500">{entry.profile.email}</p>
-              )}
             </div>
           </Link>
         </div>

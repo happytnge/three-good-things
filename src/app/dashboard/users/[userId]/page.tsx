@@ -91,7 +91,7 @@ export default function UserProfilePage() {
           {profile.avatar_url ? (
             <img
               src={profile.avatar_url}
-              alt={profile.display_name || profile.email}
+              alt={profile.display_name || 'ユーザー'}
               className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
             />
           ) : (
@@ -105,9 +105,9 @@ export default function UserProfilePage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {profile.display_name || profile.email}
+                  {profile.display_name || 'ユーザー'}
                 </h1>
-                {profile.display_name && (
+                {isOwnProfile && (
                   <p className="text-gray-600">{profile.email}</p>
                 )}
               </div>

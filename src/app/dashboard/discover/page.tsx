@@ -83,7 +83,7 @@ export default function DiscoverPage() {
                     {user.avatar_url ? (
                       <img
                         src={user.avatar_url}
-                        alt={user.display_name || user.email}
+                        alt={user.display_name || 'ユーザー'}
                         className="w-16 h-16 rounded-full object-cover"
                       />
                     ) : (
@@ -100,13 +100,8 @@ export default function DiscoverPage() {
                       className="block hover:text-blue-700 transition-colors"
                     >
                       <h3 className="font-bold text-gray-900 truncate">
-                        {user.display_name || user.email}
+                        {user.display_name || 'ユーザー'}
                       </h3>
-                      {user.display_name && (
-                        <p className="text-sm text-gray-500 truncate">
-                          {user.email}
-                        </p>
-                      )}
                     </Link>
 
                     {/* フォローボタン */}

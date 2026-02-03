@@ -109,7 +109,7 @@ export default function UserSearchBar() {
                 {user.avatar_url ? (
                   <img
                     src={user.avatar_url}
-                    alt={user.display_name || user.email}
+                    alt={user.display_name || 'ユーザー'}
                     className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                   />
                 ) : (
@@ -119,11 +119,8 @@ export default function UserSearchBar() {
                 {/* 情報 */}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 truncate">
-                    {user.display_name || user.email}
+                    {user.display_name || 'ユーザー'}
                   </p>
-                  {user.display_name && (
-                    <p className="text-sm text-gray-500 truncate">{user.email}</p>
-                  )}
                 </div>
 
                 {/* フォロー状態 */}

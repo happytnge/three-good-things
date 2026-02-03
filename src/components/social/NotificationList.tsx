@@ -124,7 +124,7 @@ export default function NotificationList() {
                   {notification.actor?.avatar_url ? (
                     <img
                       src={notification.actor.avatar_url}
-                      alt={notification.actor.display_name || notification.actor.email}
+                      alt={notification.actor.display_name || 'ユーザー'}
                       className="w-6 h-6 rounded-full object-cover"
                     />
                   ) : (
@@ -134,7 +134,7 @@ export default function NotificationList() {
                     href={`/dashboard/users/${notification.actor_id}`}
                     className="font-semibold text-gray-900 hover:text-blue-700"
                   >
-                    {notification.actor?.display_name || notification.actor?.email}
+                    {notification.actor?.display_name || 'ユーザー'}
                   </Link>
                 </div>
 
